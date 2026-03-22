@@ -296,16 +296,16 @@ def _deterministic_route(request_payload: Dict[str, Any]) -> Dict[str, Any]:
         if interaction_intent == "beg":
             outcome = _resolve_ai_outcome(context, bridge)
             if outcome == "forgive":
-                generated_text = "……好吧。这次我放过你，把武器放下，赶紧滚。"
+                generated_text = "All right. This time I'll let you live. Drop your guard and get out of here."
                 emotion_delta = 0
             elif outcome == "mercy":
-                generated_text = "我现在不想杀你了。给你一分钟，立刻从我眼前消失。"
+                generated_text = "I'm not killing you right now. You have one minute to get out of my sight."
                 emotion_delta = -1
             elif enemy:
-                generated_text = f"{npc_name}盯着你，像是在权衡要不要暂时放你一马。"
+                generated_text = f"{npc_name} stares at you as if weighing whether to spare you for a moment."
                 emotion_delta = -1
             else:
-                generated_text = f"{npc_name}看起来有些疑惑，因为你现在并不在被追杀。"
+                generated_text = f"{npc_name} looks confused, because you are not actually being hunted right now."
                 emotion_delta = 0
             reason = outcome or reason
             return {
@@ -321,16 +321,16 @@ def _deterministic_route(request_payload: Dict[str, Any]) -> Dict[str, Any]:
         elif interaction_intent == "recruit":
             outcome = _resolve_ai_outcome(context, bridge)
             if outcome == "success":
-                generated_text = "……行。我加入你，但别让我后悔。"
+                generated_text = "Fine. I'll go with you, but don't make me regret it."
                 emotion_delta = 1
             elif enemy:
-                generated_text = f"{npc_name}冷冷地拒绝了你的邀请，根本不打算跟你走。"
+                generated_text = f"{npc_name} coldly rejects your invitation and clearly has no intention of going with you."
                 emotion_delta = -2
             elif friend_flag or affinity >= 4 or social_skill >= 4:
-                generated_text = f"{npc_name}认真听完了你的邀请，但依然没有答应。"
+                generated_text = f"{npc_name} listens to your invitation seriously, but still does not agree."
                 emotion_delta = 0
             else:
-                generated_text = f"{npc_name}听了你的邀请，但态度仍然谨慎保留。"
+                generated_text = f"{npc_name} hears your invitation, but remains cautious and reserved."
                 emotion_delta = 0
             reason = outcome or reason
             return {
@@ -344,13 +344,13 @@ def _deterministic_route(request_payload: Dict[str, Any]) -> Dict[str, Any]:
                 "debug": _build_debug(context, request_payload, bridge),
             }
         elif enemy or affinity <= -3:
-            generated_text = f"{npc_name}听完你的话后皱起眉头，语气明显更不友善了。"
+            generated_text = f"{npc_name} frowns after hearing you and sounds noticeably less friendly."
             emotion_delta = -2
         elif friend_flag or affinity >= 4:
-            generated_text = f"{npc_name}回应了你的话，语气里已经带着些许信任。"
+            generated_text = f"{npc_name} replies with a tone that already carries some trust."
             emotion_delta = 1
         else:
-            generated_text = f"{npc_name}听了你的话，给出了谨慎但还算正常的回应。"
+            generated_text = f"{npc_name} hears what you said and gives a cautious but otherwise normal reply."
             emotion_delta = 0
     elif phase == "self_test":
         reason = "self_test"
