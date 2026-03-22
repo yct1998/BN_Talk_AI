@@ -1,0 +1,344 @@
+# BN Talk for CBN
+
+BN Talk 是一个面向 **Cataclysm: Bright Nights (CBN)** 的实验性 AI NPC 对话模组。
+
+它的目标不是简单替换原版固定对话，而是通过 **Lua + 注入式原生桥接 DLL + 本地 sidecar 服务 + OpenAI Compatible API**，实现类似 RimTalk 风格的自由输入 NPC 互动。
+
+当前版本支持：
+- 普通对话（Talk）
+- 向敌对 NPC 求饶（Beg）
+- 邀请 NPC 加入（Recruit）
+- 基于说话内容与情绪变化的辱骂激怒逻辑（Insult → hostile）
+
+---
+
+## 1. 项目结构
+
+主要文件与目录：
+
+- [`main.lua`](ab/bntalk/main.lua)
+  - 模组主逻辑
+  - BN Talk Console
+  - 异步请求提交与结果处理
+  - beg / recruit / insult 的游戏逻辑
+
+- [`preload.lua`](ab/bntalk/preload.lua)
+  - hook 注册入口
+
+- [`lua/context.lua`](ab/bntalk/lua/context.lua)
+  - 构建 AI 可读上下文
+
+- [`lua/memory.lua`](ab/bntalk/lua/memory.lua)
+  - NPC 记忆、好感、对话次数等持久化数据
+
+- [`lua/provider_bridge.lua`](ab/bntalk/lua/provider_bridge.lua)
+  - Lua → native bridge 请求打包
+
+- [`lua/tuning.lua`](ab/bntalk/lua/tuning.lua)
+  - insult / beg / recruit 概率参数配置
+
+- [`config/provider.openai.runtime`](ab/bntalk/config/provider.openai.runtime)
+  - OpenAI Compatible API 运行时配置
+
+- [`config/ai_prompts.txt`](ab/bntalk/config/ai_prompts.txt)
+  - AI prompt 配置文件
+  - 已从代码中迁移出来，可直接修改
+
+- [`native_bridge/bridge_dll/lua_runtime_bridge.cpp`](ab/bntalk/native_bridge/bridge_dll/lua_runtime_bridge.cpp)
+  - 注入 DLL 后向 Lua 注册原生函数
+  - 负责 Lua 请求 → JSON → sidecar
+
+- [`native_bridge/common/bntalk_protocol.cpp`](ab/bntalk/native_bridge/common/bntalk_protocol.cpp)
+  - sidecar 通讯与 fallback 路由
+
+- [`native_bridge/sidecar/server.py`](ab/bntalk/native_bridge/sidecar/server.py)
+  - 本地 sidecar 服务
+  - 调 OpenAI Compatible API
+  - 解析 AI 返回的结构化结果
+
+- [`native_bridge/injector/main.cpp`](ab/bntalk/native_bridge/injector/main.cpp)
+  - 注入器
+  - 自动启动 sidecar
+  - 向 CBN 进程注入 bridge DLL
+
+- [`native_bridge/build/rebuild_bridge.cmd`](ab/bntalk/native_bridge/build/rebuild_bridge.cmd)
+  - Windows 下重新构建注入桥与注入器
+
+---
+
+## 2. 工作原理
+
+BN Talk 运行链路如下：
+
+1. 玩家在游戏里通过 BN Talk Console 选择 NPC 并输入一句自由文本。
+2. Lua 收集 NPC / 玩家上下文，构造请求。
+3. 注入 DLL 向 Lua 暴露原生函数，把请求序列化后发送到本地 sidecar。
+4. sidecar 把请求转发到 OpenAI Compatible API（或走 deterministic fallback）。
+5. AI 返回结构化结果：
+   - `generated_text`
+   - `emotion_delta`
+   - `interaction_outcome`（beg / recruit 时）
+6. Lua 根据 AI 返回和本地状态，应用最终游戏结果：
+   - 输出台词
+   - 修改好感
+   - 激怒 / 放过 / 招募 / 跟随 / 临时宽恕等
+
+---
+
+## 3. 环境要求
+
+当前默认面向：
+- Windows 10 / 11
+- CBN Windows 版
+- Python（需要可直接调用 `python`）
+- Visual Studio C++ 工具链（如果你要自己重新编译注入桥）
+
+说明：
+- 当前注入器默认查找进程名：`cataclysm-bn-tiles.exe`
+- 如果你的游戏可执行文件名不同，需要自己修改注入器参数或源码
+
+---
+
+## 4. 安装方法
+
+### 4.1 放置模组
+把整个 [`ab/bntalk`](ab/bntalk) 文件夹放进你的 CBN 模组目录中。
+
+例如：
+- `.../userdata/mods/ab/bntalk`
+
+### 4.2 在世界中启用模组
+在创建世界或编辑世界模组时启用：
+- `BN Talk`
+
+---
+
+## 5. 配置 API
+
+编辑文件：
+- [`config/provider.openai.runtime`](ab/bntalk/config/provider.openai.runtime)
+
+当前格式示例：
+
+```json
+{
+  "base_url": "https://api.siliconflow.cn/v1",
+  "api_key": "your-api-key",
+  "model": "zai-org/GLM-4.6",
+  "temperature": 0.2,
+  "max_tokens": 1200,
+  "timeout": 20
+}
+```
+
+字段说明：
+- `base_url`：OpenAI Compatible API 根地址
+- `api_key`：API 密钥
+- `model`：模型名
+- `temperature`：采样温度
+- `max_tokens`：生成上限
+- `timeout`：超时时间（秒）
+
+---
+
+## 6. 配置 AI Prompt
+
+编辑文件：
+- [`config/ai_prompts.txt`](ab/bntalk/config/ai_prompts.txt)
+
+目前支持的 section：
+- `[base_system]`
+- `[utterance_reply_system]`
+
+你可以直接修改这里的 prompt，而不需要改 Python 代码。
+
+注意：
+- section 名不要乱改
+- 如果删掉对应 section，sidecar 会回退到代码内默认 prompt
+
+---
+
+## 7. 运行方法
+
+### 7.1 启动游戏
+先正常启动 CBN。
+
+### 7.2 运行注入器
+运行：
+- [`native_bridge/build/bntalk_injector.exe`](ab/bntalk/native_bridge/build/bntalk_injector.exe)
+
+注入器会做两件事：
+1. 自动启动本地 sidecar：[`sidecar/server.py`](ab/bntalk/native_bridge/sidecar/server.py)
+2. 向 CBN 进程注入：[`bntalk_bridge_lua.dll`](ab/bntalk/native_bridge/build/bntalk_bridge_lua.dll)
+
+如果注入成功，Lua 就能调用：
+- `bntalk_native_status`
+- `bntalk_native_route`
+- `bntalk_native_prompt_text`
+
+---
+
+## 8. 游戏内使用方法
+
+进入游戏后，使用 BN Talk Console。
+
+当前菜单包含：
+- `Talk to nearby NPC (async)`
+- `Beg hostile NPC (async)`
+- `Invite nearby NPC to join (async)`
+- `Show bridge status`
+- `Show pending async jobs`
+- `Show last generated line`
+- `Run native bridge self-test`
+- `Show quick test hint`
+
+### 8.1 普通对话
+- 选择 `Talk to nearby NPC (async)`
+- 选择附近 NPC
+- 输入一句自由文本
+- 稍后 AI 回复会显示在消息栏
+
+### 8.2 求饶
+- 先让 NPC 敌对
+- 选择 `Beg hostile NPC (async)`
+- 输入求饶内容
+- AI 会返回台词，并尝试根据结果让 NPC：
+  - 继续攻击
+  - 暂时放你走
+  - 或真正放下敌意
+
+### 8.3 招募
+- 选择 `Invite nearby NPC to join (async)`
+- 输入邀请内容
+- AI 会结合：
+  - 你的话术
+  - speech 技能
+  - affinity
+  - 预掷骰值
+  - 当前上下文
+  返回 `interaction_outcome`
+- Lua 再据此决定 NPC 是否真正加入
+
+---
+
+## 9. 概率参数调节
+
+编辑文件：
+- [`lua/tuning.lua`](ab/bntalk/lua/tuning.lua)
+
+目前可调：
+
+### insult
+- `base`
+- `emotion_weight`
+- `speech_weight`
+- `positive_affinity_divisor`
+- `extreme_bonus`
+- `minimum`
+- `maximum`
+
+### beg
+- `forgive_base`
+- `forgive_speech_weight`
+- `forgive_affinity_weight`
+- `forgive_minimum`
+- `forgive_maximum`
+- `mercy_base`
+- `mercy_speech_weight`
+- `mercy_affinity_weight`
+- `mercy_minimum`
+- `mercy_maximum`
+
+### recruit
+- `base`
+- `speech_weight`
+- `affinity_weight`
+- `minimum`
+- `maximum`
+
+说明：
+- 这些值已经接入主逻辑
+- beg / recruit / insult 都会读取这里的参数
+
+---
+
+## 10. 当前判定模型
+
+当前 beg / recruit 不是简单“Lua 先决定、AI 后配合”，而是：
+- Lua 提供：
+  - 基础 chance
+  - 预掷骰值
+  - 话术风格标签
+  - 上下文
+- sidecar / AI 返回：
+  - `generated_text`
+  - `emotion_delta`
+  - `interaction_outcome`
+- Lua 再根据 `interaction_outcome` 应用最终结果
+
+这套设计的目标是：
+- 让 AI 参与最终判定
+- 同时尽量避免台词和结果彻底脱节
+
+---
+
+## 11. 调试与日志
+
+### 11.1 游戏内 debug
+在 BN Talk Console 中可以：
+- 打开 debug lines
+- 查看概率与状态信息
+
+### 11.2 sidecar 日志
+主要日志文件：
+- [`native_bridge/build/ai_dialogue.log`](ab/bntalk/native_bridge/build/ai_dialogue.log)
+- [`native_bridge/build/bridge_runtime.log`](ab/bntalk/native_bridge/build/bridge_runtime.log)
+
+建议重点看：
+- `phase`
+- `utterance`
+- `planned_outcome`
+- `planned_tone`
+- `interaction_outcome`
+- `generated_text`
+- `emotion_delta`
+
+---
+
+## 12. 重新构建（开发者）
+
+如果你修改了：
+- [`lua_runtime_bridge.cpp`](ab/bntalk/native_bridge/bridge_dll/lua_runtime_bridge.cpp)
+- [`bntalk_protocol.cpp`](ab/bntalk/native_bridge/common/bntalk_protocol.cpp)
+- [`injector/main.cpp`](ab/bntalk/native_bridge/injector/main.cpp)
+- [`server.py`](ab/bntalk/native_bridge/sidecar/server.py)
+
+建议重新构建并更新产物：
+- [`native_bridge/build/rebuild_bridge.cmd`](ab/bntalk/native_bridge/build/rebuild_bridge.cmd)
+
+构建输出：
+- [`native_bridge/build/bntalk_bridge_lua.dll`](ab/bntalk/native_bridge/build/bntalk_bridge_lua.dll)
+- [`native_bridge/build/bntalk_injector.exe`](ab/bntalk/native_bridge/build/bntalk_injector.exe)
+
+---
+
+## 13. 已知限制
+
+当前版本仍有一些限制：
+
+1. 主要输出仍在消息栏，不是原版 NPC 对话正文 UI
+2. 某些 NPC 行为刷新仍受 CBN 原生 AI 状态机影响
+3. 某些边缘情况下，AI 台词与最终游戏结果仍可能需要继续迭代
+4. 本项目依赖注入式 DLL，不是纯 Lua 模组
+
+---
+
+
+## 14. 一句话快速使用说明
+
+1. 启用 [`bntalk`](ab/bntalk/modinfo.json)
+2. 配置 [`config/provider.openai.runtime`](ab/bntalk/config/provider.openai.runtime)
+3. 可选修改 [`config/ai_prompts.txt`](ab/bntalk/config/ai_prompts.txt)
+4. 启动 CBN
+5. 运行 [`native_bridge/build/bntalk_injector.exe`](ab/bntalk/native_bridge/build/bntalk_injector.exe)
+6. 在游戏里打开 BN Talk Console，开始与 NPC 交互
