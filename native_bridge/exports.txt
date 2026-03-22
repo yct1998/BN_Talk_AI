@@ -1,0 +1,18 @@
+Microsoft (R) COFF/PE Dumper Version 14.42.34435.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file ..\..\..\bn\game0\cataclysm-bn-tiles.exe
+
+File Type: EXECUTABLE IMAGE
+
+  Summary
+
+      3B6000 .data
+        1000 .fptable
+      271000 .pdata
+      597000 .rdata
+       1B000 .reloc
+        1000 .rodata
+       25000 .rsrc
+     319A000 .text

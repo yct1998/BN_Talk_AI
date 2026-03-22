@@ -1,0 +1,78 @@
+[
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_FIRST_MEET",
+    "dynamic_line": "<bntalk_first_meet>",
+    "responses": [
+      { "text": "How are you holding up?", "topic": "TALK_BNTALK_STATUS" },
+      { "text": "Tell me something about this place.", "topic": "TALK_BNTALK_SMALLTALK" },
+      { "text": "See you around.", "topic": "TALK_DONE" }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_NEUTRAL",
+    "dynamic_line": "<bntalk_neutral>",
+    "responses": [
+      { "text": "How are you holding up?", "topic": "TALK_BNTALK_STATUS" },
+      { "text": "Anything on your mind?", "topic": "TALK_BNTALK_MEMORY" },
+      { "text": "Later.", "topic": "TALK_DONE" }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_FRIENDLY",
+    "dynamic_line": "<bntalk_friendly>",
+    "responses": [
+      { "text": "How are you holding up?", "topic": "TALK_BNTALK_STATUS" },
+      { "text": "You remember our last talk?", "topic": "TALK_BNTALK_MEMORY" },
+      { "text": "Talk later.", "topic": "TALK_DONE" }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_FOLLOWER",
+    "dynamic_line": "<bntalk_follower>",
+    "responses": [
+      { "text": "Status report.", "topic": "TALK_BNTALK_STATUS" },
+      { "text": "Anything else?", "topic": "TALK_BNTALK_SMALLTALK" },
+      { "text": "Carry on.", "topic": "TALK_DONE" }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_ENEMY",
+    "dynamic_line": "<bntalk_enemy>",
+    "responses": [ { "text": "Fine. Just wanted to talk.", "topic": "TALK_DONE" }, { "text": "Then forget it.", "topic": "TALK_DONE" } ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_STATUS",
+    "dynamic_line": "<bntalk_status>",
+    "responses": [ { "text": "Anything else?", "topic": "TALK_BNTALK_SMALLTALK" }, { "text": "Got it.", "topic": "TALK_DONE" } ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_SMALLTALK",
+    "dynamic_line": "<bntalk_smalltalk>",
+    "responses": [
+      { "text": "You remember me, right?", "topic": "TALK_BNTALK_MEMORY" },
+      { "text": "That's enough for now.", "topic": "TALK_DONE" }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_MEMORY",
+    "dynamic_line": "<bntalk_memory>",
+    "responses": [
+      { "text": "Good to know.", "topic": "TALK_DONE" },
+      { "text": "Let's keep talking.", "topic": "TALK_BNTALK_SMALLTALK" }
+    ]
+  },
+  {
+    "type": "talk_topic",
+    "id": "TALK_BNTALK_DYNAMIC",
+    "dynamic_line": "……",
+    "responses": [ { "text": "结束对话", "topic": "TALK_DONE" } ]
+  }
+]

@@ -1,0 +1,233 @@
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x00000216CACFEBB0 lua=0x00000216C4B05888
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x00000216C4B05888
+bootstrap: process_id=11896
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+pipe_server_thread: client connected
+handle_command: LUA_PROBE
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000022E580C6960 lua=0x0000022E51BA3BA8
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000022E51BA3BA8
+bootstrap: process_id=114344
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+pipe_server_thread: client connected
+handle_command: LUA_VALIDATE
+pipe_server_thread: pipe created, waiting for client
+pipe_server_thread: client connected
+handle_command: LUA_REGISTER
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000028AF4377E60 lua=0x0000028AEFE19D78
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000028AEFE19D78
+bootstrap: process_id=40964
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+pipe_server_thread: client connected
+handle_command: LUA_VALIDATE
+pipe_server_thread: pipe created, waiting for client
+pipe_server_thread: client connected
+handle_command: LUA_REGISTER
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000019D1236C6B0 lua=0x0000019D1210D8A8
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000019D1210D8A8
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=127144
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000019D3EA7FC20 lua=0x0000019D0975E4E8
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000019D0975E4E8
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=127144
+bootstrap: pipe thread already exists
+bntalk_bridge_bootstrap: leave
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000019D3EA7FC20 lua=0x0000019D0975E4E8
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000019D0975E4E8
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=127144
+bootstrap: pipe thread already exists
+bntalk_bridge_bootstrap: leave
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x00000291769F4780 lua=0x000002917094EE58
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x000002917094EE58
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=134916
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000028BC76A3BE0 lua=0x0000028BFDEF8718
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000028BFDEF8718
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=115640
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000028890B52FE0 lua=0x0000028890CB54A8
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000028890CB54A8
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=112428
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000027088BECEF0 lua=0x000002708468E028
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x000002708468E028
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=56372
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x000001570DF2CE00 lua=0x000001570DCAE978
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x000001570DCAE978
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=65520
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client
+bntalk_bridge_bootstrap: enter
+runtime base=0x00007FF622360000
+anchor string catalua.cpp=0x00007FF62552DE00
+anchor string reg_lua_=0x00007FF62552E300
+anchor string open_function_lua=0x00007FF625B5EBF0
+anchor string lua_reload=0x00007FF62567AA60
+xref reg_lua_=none
+xref open_function_lua=none
+xref lua_reload=0x00007FF623FF9859
+lua candidate section=.data holder=0x00007FF625C77FD8 object=0x0000020ED57802A0 lua=0x0000020ED53EC9C8
+lua candidate count=1
+scan_for_loader_lua_state=true current.lua_state=0x0000020ED53EC9C8
+try_attach_lua_bridge: reason=bootstrap
+try_attach_lua_bridge: register_result={"ok":true,"details":"status_registered=true;route_registered=true"}
+bootstrap: process_id=51652
+bootstrap: pipe thread created
+bntalk_bridge_bootstrap: leave
+pipe_server_thread: starting
+pipe_server_thread: pipe created, waiting for client

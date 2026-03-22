@@ -1,0 +1,10 @@
+[
+  {
+    "type": "snippet",
+    "category": "<bntalk_provider_openai_example_doc>",
+    "text": [
+      "BN Talk provider example config is documentation only and must not be treated as a runtime provider definition.",
+      "Example values: type=openai_chat_completion; base_url=http://127.0.0.1:11434/v1; api_key=replace-me; model=bntalk-local-v1; request.model=bntalk-local-v1; temperature=0.2; max_tokens=64; response_format.type=json_object"
+    ]
+  }
+]

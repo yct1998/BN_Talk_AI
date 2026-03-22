@@ -1,0 +1,7 @@
+[
+  {
+    "type": "item_action",
+    "id": "BNTALK_DEBUG_MENU",
+    "name": { "str": "Open BN Talk Console" }
+  }
+]

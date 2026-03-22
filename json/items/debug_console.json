@@ -1,0 +1,18 @@
+[
+  {
+    "id": "bntalk_debug_console",
+    "type": "GENERIC",
+    "category": "tools",
+    "name": { "str": "BN Talk Console" },
+    "description": "A small debug console for BN Talk. Use it to enable or disable the prototype dialogue router and to print quick test hints.",
+    "weight": "50 g",
+    "volume": "250 ml",
+    "price": 0,
+    "price_postapoc": 0,
+    "material": [ "plastic" ],
+    "symbol": ";",
+    "color": "light_cyan",
+    "flags": [ "TRADER_AVOID" ],
+    "use_action": [ "BNTALK_DEBUG_MENU" ]
+  }
+]

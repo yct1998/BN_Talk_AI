@@ -1,0 +1,71 @@
+[
+  {
+    "type": "snippet",
+    "category": "<bntalk_first_meet>",
+    "text": [
+      "Hey. I don't think we've really talked before.",
+      "You look new to me. Need something?",
+      "First time we've spoken, huh? Make it count."
+    ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_neutral>",
+    "text": [
+      "Still alive. That's worth something.",
+      "Same apocalypse, different day.",
+      "Need anything, or are we just checking in?"
+    ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_friendly>",
+    "text": [
+      "Good to see you again.",
+      "You keep showing up. I think I'm starting to like that.",
+      "Things feel a bit easier when you're around."
+    ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_follower>",
+    "text": [ "I'm with you. What's the plan?", "Need orders, or just wanted to talk?", "I'm ready when you are." ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_enemy>",
+    "text": [ "I don't trust you. Speak fast.", "You're lucky I'm willing to talk at all.", "This had better be important." ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_status>",
+    "text": [ "I've been managing. Could be worse.", "I'm tired, but functional.", "Nothing's easy, but I'm still here." ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_smalltalk>",
+    "text": [
+      "These days I count a quiet hour as luxury.",
+      "Funny how the world ends and people still want conversation.",
+      "Even now, talking helps more than I like to admit."
+    ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_memory>",
+    "text": [
+      "I remember the last time we talked. That matters more than you think.",
+      "People disappear fast these days. Seeing a familiar face sticks with you.",
+      "I notice who keeps coming back."
+    ]
+  },
+  {
+    "type": "snippet",
+    "category": "<bntalk_dynamic>",
+    "text": [
+      "The bridge is active, but no injected dialogue line was provided yet.",
+      "Native BN Talk bridge connected. Waiting for generated text.",
+      "This is the dynamic topic shell. The injector should replace or accompany this line."
+    ]
+  }
+]

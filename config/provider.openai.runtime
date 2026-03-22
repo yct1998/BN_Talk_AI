@@ -1,0 +1,8 @@
+{
+  "base_url": "https://api.siliconflow.cn/v1",
+  "api_key": "u_api_key",
+  "model": "zai-org/GLM-4.6",
+  "temperature": 0.2,
+  "max_tokens": 1200,
+  "timeout": 20
+}
