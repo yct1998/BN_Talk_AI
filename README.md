@@ -31,49 +31,49 @@ Current interaction types:
 
 Main files and directories:
 
-- [`main.lua`](ab/bntalk/main.lua)
+- [`main.lua`](main.lua)
   - Main mod logic
   - BN Talk Console
   - Async request flow
   - Beg / recruit / insult gameplay resolution
 
-- [`preload.lua`](ab/bntalk/preload.lua)
+- [`preload.lua`](preload.lua)
   - Hook registration entry
 
-- [`lua/context.lua`](ab/bntalk/lua/context.lua)
+- [`lua/context.lua`](lua/context.lua)
   - AI-readable context builder
 
-- [`lua/memory.lua`](ab/bntalk/lua/memory.lua)
+- [`lua/memory.lua`](lua/memory.lua)
   - Persistent NPC memory, affinity, interaction counters
 
-- [`lua/provider_bridge.lua`](ab/bntalk/lua/provider_bridge.lua)
+- [`lua/provider_bridge.lua`](lua/provider_bridge.lua)
   - Lua → native bridge request packing
 
-- [`lua/tuning.lua`](ab/bntalk/lua/tuning.lua)
+- [`lua/tuning.lua`](lua/tuning.lua)
   - Tunable insult / beg / recruit parameters
 
-- [`config/provider.openai.runtime`](ab/bntalk/config/provider.openai.runtime)
+- [`config/provider.openai.runtime`](config/provider.openai.runtime)
   - Runtime API configuration
 
-- [`config/ai_prompts.txt`](ab/bntalk/config/ai_prompts.txt)
+- [`config/ai_prompts.txt`](config/ai_prompts.txt)
   - Editable AI prompt definitions
 
-- [`native_bridge/bridge_dll/lua_runtime_bridge.cpp`](ab/bntalk/native_bridge/bridge_dll/lua_runtime_bridge.cpp)
+- [`native_bridge/bridge_dll/lua_runtime_bridge.cpp`](native_bridge/bridge_dll/lua_runtime_bridge.cpp)
   - Registers native Lua functions after injection
 
-- [`native_bridge/common/bntalk_protocol.cpp`](ab/bntalk/native_bridge/common/bntalk_protocol.cpp)
+- [`native_bridge/common/bntalk_protocol.cpp`](native_bridge/common/bntalk_protocol.cpp)
   - Sidecar transport + fallback routing
 
-- [`native_bridge/sidecar/server.py`](ab/bntalk/native_bridge/sidecar/server.py)
+- [`native_bridge/sidecar/server.py`](native_bridge/sidecar/server.py)
   - Local sidecar service
   - Talks to an OpenAI-compatible API
   - Parses structured AI output
 
-- [`native_bridge/injector/main.cpp`](ab/bntalk/native_bridge/injector/main.cpp)
+- [`native_bridge/injector/main.cpp`](native_bridge/injector/main.cpp)
   - DLL injector
   - Auto-starts the sidecar
 
-- [`native_bridge/build/rebuild_bridge.cmd`](ab/bntalk/native_bridge/build/rebuild_bridge.cmd)
+- [`native_bridge/build/rebuild_bridge.cmd`](native_bridge/build/rebuild_bridge.cmd)
   - Windows rebuild script for bridge artifacts
 
 ---
@@ -127,7 +127,7 @@ Enable `BN Talk` when creating or editing a world.
 ## API configuration
 
 Edit:
-- [`config/provider.openai.runtime`](ab/bntalk/config/provider.openai.runtime)
+- [`config/provider.openai.runtime`](config/provider.openai.runtime)
 
 Example format:
 
@@ -156,7 +156,7 @@ Fields:
 ## AI prompt configuration
 
 Edit:
-- [`config/ai_prompts.txt`](ab/bntalk/config/ai_prompts.txt)
+- [`config/ai_prompts.txt`](config/ai_prompts.txt)
 
 Currently supported sections:
 - `[base_system]`
@@ -177,11 +177,11 @@ Launch the game normally.
 
 ### 2. Run the injector
 Run:
-- [`native_bridge/build/bntalk_injector.exe`](ab/bntalk/native_bridge/build/bntalk_injector.exe)
+- [`native_bridge/build/bntalk_injector.exe`](native_bridge/build/bntalk_injector.exe)
 
 The injector will:
-1. auto-start the local sidecar ([`sidecar/server.py`](ab/bntalk/native_bridge/sidecar/server.py))
-2. inject [`bntalk_bridge_lua.dll`](ab/bntalk/native_bridge/build/bntalk_bridge_lua.dll) into the CBN process
+1. auto-start the local sidecar ([`sidecar/server.py`](native_bridge/sidecar/server.py))
+2. inject [`bntalk_bridge_lua.dll`](native_bridge/build/bntalk_bridge_lua.dll) into the CBN process
 
 If injection succeeds, Lua can call:
 - `bntalk_native_status`
@@ -235,7 +235,7 @@ Current menu actions:
 ## Tuning gameplay odds
 
 Edit:
-- [`lua/tuning.lua`](ab/bntalk/lua/tuning.lua)
+- [`lua/tuning.lua`](lua/tuning.lua)
 
 Currently tunable:
 
@@ -301,8 +301,8 @@ BN Talk Console can show:
 
 ### Log files
 Main logs:
-- [`native_bridge/build/ai_dialogue.log`](ab/bntalk/native_bridge/build/ai_dialogue.log)
-- [`native_bridge/build/bridge_runtime.log`](ab/bntalk/native_bridge/build/bridge_runtime.log)
+- [`native_bridge/build/ai_dialogue.log`](native_bridge/build/ai_dialogue.log)
+- [`native_bridge/build/bridge_runtime.log`](native_bridge/build/bridge_runtime.log)
 
 Useful fields to inspect:
 - `phase`
@@ -318,17 +318,17 @@ Useful fields to inspect:
 ## Rebuilding (developers)
 
 If you modify:
-- [`lua_runtime_bridge.cpp`](ab/bntalk/native_bridge/bridge_dll/lua_runtime_bridge.cpp)
-- [`bntalk_protocol.cpp`](ab/bntalk/native_bridge/common/bntalk_protocol.cpp)
-- [`injector/main.cpp`](ab/bntalk/native_bridge/injector/main.cpp)
-- [`server.py`](ab/bntalk/native_bridge/sidecar/server.py)
+- [`lua_runtime_bridge.cpp`](native_bridge/bridge_dll/lua_runtime_bridge.cpp)
+- [`bntalk_protocol.cpp`](native_bridge/common/bntalk_protocol.cpp)
+- [`injector/main.cpp`](native_bridge/injector/main.cpp)
+- [`server.py`](native_bridge/sidecar/server.py)
 
 Rebuild with:
-- [`native_bridge/build/rebuild_bridge.cmd`](ab/bntalk/native_bridge/build/rebuild_bridge.cmd)
+- [`native_bridge/build/rebuild_bridge.cmd`](native_bridge/build/rebuild_bridge.cmd)
 
 Outputs:
-- [`native_bridge/build/bntalk_bridge_lua.dll`](ab/bntalk/native_bridge/build/bntalk_bridge_lua.dll)
-- [`native_bridge/build/bntalk_injector.exe`](ab/bntalk/native_bridge/build/bntalk_injector.exe)
+- [`native_bridge/build/bntalk_bridge_lua.dll`](native_bridge/build/bntalk_bridge_lua.dll)
+- [`native_bridge/build/bntalk_injector.exe`](native_bridge/build/bntalk_injector.exe)
 
 ---
 
@@ -345,9 +345,9 @@ Current limitations include:
 
 ## Quick start
 
-1. Enable [`bntalk`](ab/bntalk/modinfo.json)
-2. Configure [`config/provider.openai.runtime`](ab/bntalk/config/provider.openai.runtime)
-3. Optionally edit [`config/ai_prompts.txt`](ab/bntalk/config/ai_prompts.txt)
+1. Enable [`bntalk`](modinfo.json)
+2. Configure [`config/provider.openai.runtime`](config/provider.openai.runtime)
+3. Optionally edit [`config/ai_prompts.txt`](config/ai_prompts.txt)
 4. Start CBN
-5. Run [`native_bridge/build/bntalk_injector.exe`](ab/bntalk/native_bridge/build/bntalk_injector.exe)
+5. Run [`native_bridge/build/bntalk_injector.exe`](native_bridge/build/bntalk_injector.exe)
 6. Open BN Talk Console in-game and interact with NPCs
