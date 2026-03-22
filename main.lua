@@ -20,6 +20,7 @@ local poll_async_jobs
 local function ensure_runtime_state()
 	mod.pending_jobs = mod.pending_jobs or {}
 	mod.mercy_jobs = mod.mercy_jobs or {}
+	mod.forgive_jobs = mod.forgive_jobs or {}
 	mod.dialogue_queue = mod.dialogue_queue or {}
 end
 
@@ -300,17 +301,49 @@ local function get_social_skill( player )
 end
 
 local function current_turn_number()
-	local ok, turn_obj = pcall( function()
-		return game.current_turn()
+	local function extract_turn( turn_obj )
+		if not turn_obj then
+			return nil
+		end
+		if turn_obj.to_turn then
+			local ok_turn, turn = pcall( function()
+				return turn_obj:to_turn()
+			end )
+			if ok_turn and turn ~= nil then
+				return tonumber( turn )
+			end
+		end
+		if turn_obj.get_turn then
+			local ok_turn, turn = pcall( function()
+				return turn_obj:get_turn()
+			end )
+			if ok_turn and turn ~= nil then
+				return tonumber( turn )
+			end
+		end
+		return nil
+	end
+
+	local ok_gapi, gapi_turn = pcall( function()
+		return gapi and gapi.current_turn and gapi.current_turn()
 	end )
-	if ok and turn_obj and turn_obj.get_turn then
-		local ok_turn, turn = pcall( function()
-			return turn_obj:get_turn()
-		end )
-		if ok_turn and turn then
-			return tonumber( turn ) or 0
+	if ok_gapi then
+		local turn = extract_turn( gapi_turn )
+		if turn ~= nil then
+			return turn
 		end
 	end
+
+	local ok_game, game_turn = pcall( function()
+		return game and game.current_turn and game.current_turn()
+	end )
+	if ok_game then
+		local turn = extract_turn( game_turn )
+		if turn ~= nil then
+			return turn
+		end
+	end
+
 	return 0
 end
 
@@ -619,6 +652,19 @@ local function get_npc_attitude_number( npc )
 	return tonumber( get_npc_attitude_text( npc ) ) or -1
 end
 
+local function get_npc_value_text( npc, key )
+	if not npc or not key then
+		return ""
+	end
+	local ok, value = pcall( function()
+		return npc:get_value( key )
+	end )
+	if ok and value ~= nil then
+		return tostring( value )
+	end
+	return ""
+end
+
 local function try_force_npc_peaceful( npc, prefer_ally )
 	if not npc then
 		return false, "npc_missing"
@@ -640,7 +686,7 @@ local function try_force_npc_peaceful( npc, prefer_ally )
 	end
 
 	local primary = prefer_ally and "make_ally" or "make_friendly"
-	local secondary = prefer_ally and "make_friendly" or "make_ally"
+	local secondary = prefer_ally and "make_friendly" or nil
 
 	local ok_primary = select( 1, try_call_method( npc, primary ) )
 	note( primary, ok_primary )
@@ -650,12 +696,14 @@ local function try_force_npc_peaceful( npc, prefer_ally )
 		return true, table.concat( steps, ";" )
 	end
 
-	local ok_secondary = select( 1, try_call_method( npc, secondary ) )
-	note( secondary, ok_secondary )
-	if resolved() then
-		table.insert( steps, "attitude_after=" .. get_npc_attitude_text( npc ) )
-		table.insert( steps, "enemy_after=" .. tostring( util.safe_bool_call( npc, "is_enemy" ) ) )
-		return true, table.concat( steps, ";" )
+	if secondary then
+		local ok_secondary = select( 1, try_call_method( npc, secondary ) )
+		note( secondary, ok_secondary )
+		if resolved() then
+			table.insert( steps, "attitude_after=" .. get_npc_attitude_text( npc ) )
+			table.insert( steps, "enemy_after=" .. tostring( util.safe_bool_call( npc, "is_enemy" ) ) )
+			return true, table.concat( steps, ";" )
+		end
 	end
 
 	local attitude_targets = prefer_ally
@@ -667,7 +715,6 @@ local function try_force_npc_peaceful( npc, prefer_ally )
 		or {
 			{ label = "NPCATT_TALK", value = 1 },
 			{ label = "NPCATT_NULL", value = 0 },
-			{ label = "NPCATT_FOLLOW", value = 3 },
 		}
 	for _, attitude in ipairs( attitude_targets ) do
 		local ok_set = select( 1, try_call_method( npc, "set_attitude", attitude.value ) )
@@ -745,6 +792,7 @@ local function clear_temporary_mercy( npc )
 	if npc then
 		npc:set_value( "bntalk_mercy_until_turn", "" )
 		npc:set_value( "bntalk_mercy_active", "" )
+		npc:set_value( "bntalk_mercy_origin_attitude", "" )
 	end
 end
 
@@ -757,17 +805,122 @@ local function drop_mercy_job_for_npc( npc )
 	end
 end
 
+local function has_mercy_job_for_npc( npc )
+	ensure_runtime_state()
+	for _, job in ipairs( mod.mercy_jobs ) do
+		if job.npc_ref == npc then
+			return true
+		end
+	end
+	return false
+end
+
+local function sync_mercy_job_for_npc( npc )
+	ensure_runtime_state()
+	if not npc then
+		return false
+	end
+	if get_npc_value_text( npc, "bntalk_mercy_active" ) ~= "yes" or has_mercy_job_for_npc( npc ) then
+		return false
+	end
+	local until_turn = tonumber( get_npc_value_text( npc, "bntalk_mercy_until_turn" ) ) or current_turn_number()
+	local origin_attitude = tonumber( get_npc_value_text( npc, "bntalk_mercy_origin_attitude" ) ) or 10
+	table.insert( mod.mercy_jobs, {
+		npc_ref = npc,
+		npc_name = util.safe_name( npc ),
+		until_turn = until_turn,
+		origin_attitude = origin_attitude,
+	} )
+	return true
+end
+
+local function sync_visible_mercy_jobs( player )
+	if not player then
+		return
+	end
+	for _, npc in ipairs( collect_visible_npcs( player ) ) do
+		sync_mercy_job_for_npc( npc )
+	end
+end
+
+local function clear_forgive_state( npc )
+	if npc then
+		npc:set_value( "bntalk_forgive_active", "" )
+	end
+end
+
+local function drop_forgive_job_for_npc( npc )
+	ensure_runtime_state()
+	for index = #mod.forgive_jobs, 1, -1 do
+		if mod.forgive_jobs[index].npc_ref == npc then
+			table.remove( mod.forgive_jobs, index )
+		end
+	end
+end
+
+local function has_forgive_job_for_npc( npc )
+	ensure_runtime_state()
+	for _, job in ipairs( mod.forgive_jobs ) do
+		if job.npc_ref == npc then
+			return true
+		end
+	end
+	return false
+end
+
+local function track_forgiven_npc( npc )
+	ensure_runtime_state()
+	if not npc then
+		return false
+	end
+	clear_forgive_state( npc )
+	drop_forgive_job_for_npc( npc )
+	npc:set_value( "bntalk_forgive_active", "yes" )
+	table.insert( mod.forgive_jobs, {
+		npc_ref = npc,
+		npc_name = util.safe_name( npc ),
+	} )
+	return true
+end
+
+local function sync_forgive_job_for_npc( npc )
+	ensure_runtime_state()
+	if not npc then
+		return false
+	end
+	if get_npc_value_text( npc, "bntalk_forgive_active" ) ~= "yes" or has_forgive_job_for_npc( npc ) then
+		return false
+	end
+	table.insert( mod.forgive_jobs, {
+		npc_ref = npc,
+		npc_name = util.safe_name( npc ),
+	} )
+	return true
+end
+
+local function sync_visible_forgive_jobs( player )
+	if not player then
+		return
+	end
+	for _, npc in ipairs( collect_visible_npcs( player ) ) do
+		sync_forgive_job_for_npc( npc )
+	end
+end
+
 local function queue_temporary_mercy( npc, duration_turns )
 	ensure_runtime_state()
 	local mercy_until_turn = current_turn_number() + ( duration_turns or 60 )
+	local origin_attitude = 10
 	clear_temporary_mercy( npc )
 	drop_mercy_job_for_npc( npc )
 	npc:set_value( "bntalk_mercy_until_turn", tostring( mercy_until_turn ) )
 	npc:set_value( "bntalk_mercy_active", "yes" )
+	npc:set_value( "bntalk_mercy_origin_attitude", tostring( origin_attitude ) )
 	table.insert( mod.mercy_jobs, {
 		npc_ref = npc,
 		npc_name = util.safe_name( npc ),
 		until_turn = mercy_until_turn,
+		origin_attitude = origin_attitude,
 	} )
 end
 
@@ -791,6 +944,37 @@ local function apply_mercy_pause( npc )
 	return ok_apply == true
 end
 
+local function process_forgive_jobs()
+	ensure_runtime_state()
+	for index = #mod.forgive_jobs, 1, -1 do
+		local job = mod.forgive_jobs[index]
+		local npc = job.npc_ref
+		local remove_job = false
+		if not npc then
+			remove_job = true
+		elseif get_npc_value_text( npc, "bntalk_forgive_active" ) ~= "yes" then
+			remove_job = true
+		elseif util.safe_bool_call( npc, "is_enemy" ) then
+			local peaceful = select( 1, try_force_npc_peaceful( npc, false ) )
+			if not peaceful then
+				try_call_method( npc, "set_attitude", 1 )
+				peaceful = util.safe_bool_call( npc, "is_enemy" ) ~= true
+			end
+			if not peaceful then
+				try_call_method( npc, "set_attitude", 0 )
+				peaceful = util.safe_bool_call( npc, "is_enemy" ) ~= true
+			end
+			if not peaceful then
+				remove_job = true
+				clear_forgive_state( npc )
+			end
+		end
+		if remove_job then
+			table.remove( mod.forgive_jobs, index )
+		end
+	end
+end
+
 local function process_mercy_jobs()
 	ensure_runtime_state()
 	local now_turn = current_turn_number()
@@ -806,11 +990,43 @@ local function process_mercy_jobs()
 		elseif now_turn >= ( job.until_turn or 0 ) then
 			clear_temporary_mercy( npc )
 			local was_enemy = util.safe_bool_call( npc, "is_enemy" )
-			try_call_method( npc, "make_angry" )
-			if not was_enemy and util.safe_bool_call( npc, "is_enemy" ) then
-				gapi.add_msg( MsgType.bad, string.format( "%s stops tolerating you and turns hostile again.", util.safe_name( npc ) ) )
+			local restored = false
+			local origin_attitude = tonumber( job.origin_attitude ) or 10
+			if origin_attitude == 10 then
+				local ok_set_hostile = select( 1, try_call_method( npc, "set_attitude", 10 ) )
+				if ok_set_hostile then
+					restored = util.safe_bool_call( npc, "is_enemy" )
+				end
+				if not restored then
+					try_call_method( npc, "make_angry" )
+					restored = util.safe_bool_call( npc, "is_enemy" )
+				end
+			else
+				local ok_set = select( 1, try_call_method( npc, "set_attitude", origin_attitude ) )
+				restored = ok_set == true and util.safe_bool_call( npc, "is_enemy" )
+				if not restored then
+					local ok_set_hostile = select( 1, try_call_method( npc, "set_attitude", 10 ) )
+					if ok_set_hostile then
+						restored = util.safe_bool_call( npc, "is_enemy" )
+					end
+				end
+				if not restored then
+					try_call_method( npc, "make_angry" )
+					restored = util.safe_bool_call( npc, "is_enemy" )
+				end
 			end
-			remove_job = true
+			if restored then
+				if not was_enemy then
+					gapi.add_msg( MsgType.bad, string.format( "%s stops tolerating you and turns hostile again.", util.safe_name( npc ) ) )
+				end
+				remove_job = true
+			else
+				npc:set_value( "bntalk_mercy_until_turn", tostring( now_turn + 1 ) )
+				npc:set_value( "bntalk_mercy_active", "yes" )
+				npc:set_value( "bntalk_mercy_origin_attitude", tostring( origin_attitude ) )
+				job.until_turn = now_turn + 1
+				job.origin_attitude = origin_attitude
+			end
 		end
 		if remove_job then
 			table.remove( mod.mercy_jobs, index )
@@ -928,13 +1144,16 @@ local function apply_beg_outcome( player, npc, plan, interaction_outcome )
 	if resolved_outcome == "forgive" then
 		clear_temporary_mercy( npc )
 		drop_mercy_job_for_npc( npc )
-		local peaceful, transition_debug = try_force_npc_peaceful( npc, true )
+		local peaceful, transition_debug = try_force_npc_peaceful( npc, false )
 		table.insert( debug_parts, "forgive_transition=" .. transition_debug )
 		if peaceful then
+			track_forgiven_npc( npc )
 			memory.add_affinity( npc, 2 )
 			return "forgive", forgive_chance, mercy_chance, table.concat( debug_parts, ";" )
 		end
 	elseif resolved_outcome == "mercy" then
+		clear_forgive_state( npc )
+		drop_forgive_job_for_npc( npc )
 		local peaceful, transition_debug = try_force_npc_peaceful( npc, false )
 		table.insert( debug_parts, "mercy_transition=" .. transition_debug )
 		if peaceful then
@@ -942,6 +1161,8 @@ local function apply_beg_outcome( player, npc, plan, interaction_outcome )
 			return "mercy", forgive_chance, mercy_chance, table.concat( debug_parts, ";" )
 		end
 	else
+		clear_forgive_state( npc )
+		drop_forgive_job_for_npc( npc )
 		table.insert( debug_parts, "resolved_fail" )
 	end
 	if npc then
@@ -1253,6 +1474,8 @@ local function deliver_async_result( player, request_id, job, response )
 		else
 			local turned_hostile, hostile_chance = try_force_npc_hostile( player, npc, tostring( job.utterance or "" ), emotion_delta )
 			if turned_hostile and not was_enemy then
+				clear_forgive_state( npc )
+				drop_forgive_job_for_npc( npc )
 				npc:set_value( "bntalk_hostile_due_to_abuse", "yes" )
 				gapi.add_msg( MsgType.bad, string.format( "[bntalk] %s turns hostile after extreme verbal abuse.", util.safe_name( npc ) ) )
 			elseif util.is_debug( player ) and hostile_chance > 0 then
@@ -1398,7 +1621,11 @@ mod.on_game_started = function()
 end
 
 mod.on_game_load = function()
-	ensure_player_ready()
+	local player = ensure_player_ready()
+	sync_visible_mercy_jobs( player )
+	sync_visible_forgive_jobs( player )
+	process_forgive_jobs()
+	process_mercy_jobs()
 end
 
 mod.on_npc_interaction = function( params )
@@ -1412,6 +1639,10 @@ mod.on_npc_interaction = function( params )
 		return
 	end
 
+	sync_mercy_job_for_npc( npc )
+	sync_forgive_job_for_npc( npc )
+	process_forgive_jobs()
+	process_mercy_jobs()
 	memory.note_interaction( npc, "npc_interaction" )
 end
 
@@ -1460,6 +1691,7 @@ end
 
 mod.on_every_second = function()
 	local player = ensure_player_ready()
+	process_forgive_jobs()
 	process_mercy_jobs()
 	if player and util.is_enabled( player ) then
 		poll_async_jobs()
