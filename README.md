@@ -114,10 +114,10 @@ Notes:
 ## Installation
 
 ### 1. Place the mod
-Copy the whole [`ab/bntalk`](ab/bntalk) folder into your CBN mod directory.
+Copy the whole [`bntalk`](bntalk) folder into your CBN mod directory.
 
 Example:
-- `.../userdata/mods/ab/bntalk`
+- `.../userdata/mods/bntalk`
 
 ### 2. Enable the mod
 Enable `BN Talk` when creating or editing a world.
